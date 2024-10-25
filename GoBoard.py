@@ -16,6 +16,11 @@ white_color = (255, 255, 255)
 # 棋盘大小和格子大小
 board_size = 19
 cell_size = size // (board_size + 1)
+click_radius = cell_size // 2  # 设置点击响应范围
+
+# 横向和纵向坐标标记
+letters = "ABCDEFGHJKLMNOPQRST"
+numbers = list(range(19, 0, -1))
 
 class GoBoard:
     def __init__(self, size=19):
@@ -76,6 +81,13 @@ def draw_board(screen, board):
     for i in range(board_size):
         pygame.draw.line(screen, line_color, (cell_size, cell_size + i * cell_size), (size - cell_size, cell_size + i * cell_size))
         pygame.draw.line(screen, line_color, (cell_size + i * cell_size, cell_size), (cell_size + i * cell_size, size - cell_size))
+        # 绘制横向坐标
+        font = pygame.font.SysFont(None, 24)
+        text = font.render(letters[i], True, line_color)
+        screen.blit(text, (cell_size + i * cell_size - text.get_width() // 2, size - cell_size + 5))
+        # 绘制纵向坐标
+        text = font.render(str(numbers[i]), True, line_color)
+        screen.blit(text, (5, cell_size + i * cell_size - text.get_height() // 2))
     for x in range(board.size):
         for y in range(board.size):
             if board.board[x][y] == '●':
@@ -91,11 +103,11 @@ def main():
                 pygame.quit()
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = event.pos
-                x = (x - cell_size) // cell_size
-                y = (y - cell_size) // cell_size
+                mx, my = event.pos
+                x = (my - cell_size // 2) // cell_size
+                y = (mx - cell_size // 2) // cell_size
                 if 0 <= x < board_size and 0 <= y < board_size:
-                    if board.place_stone(y, x):
+                    if board.place_stone(x, y):
                         draw_board(screen, board)
                         pygame.display.flip()
 
